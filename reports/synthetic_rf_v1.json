@@ -1,0 +1,75 @@
+{
+  "dataset": "data/raw/wait_times.csv",
+  "dataset_sha256": "45811fce2d8c428bf81a4e2da8ef6f7bcf4bdd9ecc392e542bf7d207723ca3e6",
+  "model": "models/synthetic_rf_v1.joblib",
+  "model_sha256": "063de40d89d85606533ee1e65be0a9b73cd0ea068ee4ee8d0e01021a026ea42a",
+  "seed": 42,
+  "n_estimators": 200,
+  "n_jobs": 1,
+  "rows": 5000,
+  "unique_feature_combinations": 839,
+  "feature_names": [
+    "ride_Forbidden Journey",
+    "ride_Hagrid's Motorbike",
+    "ride_Hulk Coaster",
+    "ride_Revenge of the Mummy",
+    "ride_Rip Ride Rockit",
+    "ride_Spider-Man",
+    "ride_Transformers",
+    "ride_VelociCoaster",
+    "day_Mon",
+    "day_Tue",
+    "day_Wed",
+    "day_Thu",
+    "day_Fri",
+    "day_Sat",
+    "day_Sun",
+    "hour"
+  ],
+  "versions": {
+    "python": "3.12.7",
+    "numpy": "2.5.1",
+    "pandas": "3.0.3",
+    "scikit-learn": "1.9.0",
+    "joblib": "1.5.3"
+  },
+  "evaluation": {
+    "random_rows": {
+      "train_rows": 4000,
+      "test_rows": 1000,
+      "overlapping_feature_combinations": 582,
+      "baseline_mean": {
+        "mae_minutes": 16.708493,
+        "rmse_minutes": 20.469754299026164,
+        "r2": -0.0004575364624626044
+      },
+      "random_forest": {
+        "mae_minutes": 8.00444759050463,
+        "rmse_minutes": 9.86731573138426,
+        "r2": 0.7675275727013842
+      }
+    },
+    "held_out_combinations": {
+      "train_rows": 4024,
+      "test_rows": 976,
+      "overlapping_feature_combinations": 0,
+      "baseline_mean": {
+        "mae_minutes": 15.21010209236385,
+        "rmse_minutes": 18.98145823713091,
+        "r2": -0.0052562844788826
+      },
+      "random_forest": {
+        "mae_minutes": 8.270784711551997,
+        "rmse_minutes": 10.14081015401699,
+        "r2": 0.7130785915241145
+      }
+    }
+  },
+  "final_fit": "All CSV rows; reported holdout scores belong to separate evaluation models.",
+  "limitations": [
+    "All observations are synthetic, not real-world wait times.",
+    "Random-row splits share repeated feature combinations; grouped scores keep combinations disjoint.",
+    "Grouped holdout is not temporal validation and does not test new rides or real observations.",
+    "No tuning or test-driven model selection was performed; these are single fixed holdouts."
+  ]
+}

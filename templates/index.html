@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Explore synthetic theme-park wait estimates with a local machine-learning demo.">
+<title>Queue Atlas | Your next adventure</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+<script src="{{ url_for('static', filename='current-waits.js') }}" defer></script>
+<script src="{{ url_for('static', filename='history.js') }}" defer></script>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="/" aria-label="Queue Atlas home"><span class="brand-mark" aria-hidden="true">Q</span> QUEUE ATLAS</a><span class="local-badge"><span></span> LOCAL EXPLORER</span></header>
+<main>
+<section class="hero" aria-labelledby="headline">
+<div class="hero-copy"><p class="eyebrow">LESS GUESSWORK. MORE ADVENTURE.</p><h1 id="headline">A little foresight.<br>A bigger <em>adventure.</em></h1><p class="intro">Pick a ride, choose your moment, and explore an estimated wait. Your next adventure starts with a little curiosity.</p><a class="text-link" href="#explorer">Find your next ride <span aria-hidden="true">&#8599;</span></a><div class="hero-notes"><span>08 supported rides</span><span>08:00 &ndash; 22:00</span></div></div>
+<div class="park-art" aria-hidden="true"><div class="sun"></div><div class="cloud cloud-one"></div><div class="cloud cloud-two"></div><div class="wheel"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="wheel-leg left-leg"></div><div class="wheel-leg right-leg"></div><div class="coaster"></div><div class="coaster-support support-one"></div><div class="coaster-support support-two"></div><div class="hill hill-one"></div><div class="hill hill-two"></div><div class="art-caption">TAKE THE SCENIC ROUTE <span>&#10022;</span></div></div>
+</section>
+<div class="disclosure"><span class="disclosure-icon" aria-hidden="true">i</span><div><strong>{{ disclaimer }}</strong><p>An interactive machine-learning demo using simulated data. These synthetic predictions do not use the collected park observations below.</p></div></div>
+<section id="explorer" class="explorer" aria-labelledby="explorer-title">
+<div class="form-panel"><p class="eyebrow">01 / PLAN YOUR MOMENT</p><h2 id="explorer-title">Where are we headed?</h2><p class="muted">Choose a ride and a time to explore.</p>
+<form id="prediction-form" action="/api/predict" method="post">
+<label for="ride">Your ride</label><select name="ride" id="ride" required><option value="" selected disabled>Select an adventure</option>{% for ride in rides %}<option value="{{ ride }}">{{ ride }}</option>{% endfor %}</select>
+<div class="field-row"><div><label for="day">Day of the week</label><select id="day" name="day" required><option value="" selected disabled>Choose a day</option>{% for day in days %}<option value="{{ day }}">{{ day }}</option>{% endfor %}</select></div><div><label for="hour">Time of day</label><select id="hour" name="hour" required><option value="" selected disabled>Choose a time</option>{% for hour in hours %}<option value="{{ hour }}">{{ '%02d:00'|format(hour) }}</option>{% endfor %}</select></div></div>
+<button type="submit" id="submit-button">Explore wait estimate <span aria-hidden="true">&#8594;</span></button>
+<p class="form-note">All times use the selected hour, without a date or timezone forecast.</p>
+</form><noscript><p class="error">Enable JavaScript to request an estimate.</p></noscript></div>
+<div class="result-panel" id="result-panel" aria-busy="false"><p class="eyebrow">02 / YOUR ESTIMATED WAIT</p><div id="result-content" role="status" aria-live="polite" aria-atomic="true"><div class="ticket-icon" aria-hidden="true">&#10022;</div><h3>Your adventure awaits.</h3><p class="muted">Make your selections and we will take it from here.</p></div><p id="error-message" class="error" role="alert" hidden></p><div class="result-disclaimer">{{ disclaimer }}</div></div>
+</section>
+<section class="details" aria-label="About these estimates"><article><span>01</span><h3>Built for exploration</h3><p>Eight supported rides. Seven weekdays. Discover patterns in simulated park waits.</p></article><article><span>02</span><h3>Patterns, not promises</h3><p>Estimates come from a model trained on synthetic observations. Actual waits may differ substantially.</p></article><article><span>03</span><h3>A local experience</h3><p>Explore synthetic estimates and separately collected park observations on your computer.</p></article></section>
+{% include '_current_waits.html' %}
+{% include '_history.html' %}
+</main><footer><span class="footer-brand">QUEUE ATLAS</span><span>A little data. A little adventure.</span><span>Synthetic estimates &amp; stored observations &middot; Local only</span></footer>
+</body></html>

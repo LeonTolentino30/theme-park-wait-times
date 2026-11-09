@@ -1,4 +1,59 @@
+# Local Python environments (untracking does not delete them).
 venv/
+.venv/
+env/
+ENV/
+
+# Secrets and machine-specific configuration.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+
+# Private provider observations, registries, responses, and pilot state.
+/private/
+/data/real/
+/data/provider/
+/data/observations/
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.db
+*.db-*
+*.log
+*.log.*
+
+# Serialized models are generated locally from reviewed source.
+/models/
+
+# Python, notebook, test, and coverage caches.
 __pycache__/
+*.py[cod]
 .ipynb_checkpoints/
-models/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Packaging and build output.
+/build/
+/dist/
+.eggs/
+*.egg-info/
+
+# Local editor/operating-system state.
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
