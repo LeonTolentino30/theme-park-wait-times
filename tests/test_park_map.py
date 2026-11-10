@@ -81,7 +81,7 @@ class MapTests(unittest.TestCase):
         self.assertEqual(self.client.get('/api/map-attractions').headers['Referrer-Policy'],'no-referrer')
 
     def test_vendored_leaflet_integrity(self):
-        expected={'leaflet.js':'20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=','leaflet.css':'p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='}
+        expected={'leaflet.js':'20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=','leaflet.css':'M3v8pcq9A7OYFbJwD+vis7ft9VkhxZzUn4jssyghIwM='}
         import base64
         for name,digest in expected.items():
             self.assertEqual(base64.b64encode(hashlib.sha256((Path('static/vendor/leaflet-1.9.4')/name).read_bytes()).digest()).decode(),digest)

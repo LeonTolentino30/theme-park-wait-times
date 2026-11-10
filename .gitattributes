@@ -1,0 +1,3 @@
+# SRI hashes require identical vendor asset bytes on Windows and Linux.
+/static/vendor/leaflet-1.9.4/leaflet.css text eol=lf
+/static/vendor/leaflet-1.9.4/leaflet.js text eol=lf
