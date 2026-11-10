@@ -1,0 +1,170 @@
+{
+  "type": "FeatureCollection",
+  "license": "ODbL-1.0",
+  "attribution": "OpenStreetMap contributors",
+  "source": "https://www.openstreetmap.org/copyright",
+  "osm_snapshot": "2026-11-10T17:43:48Z",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "61079a31-4165-4fb0-b36f-c01c5971f80a",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.4724911,
+          28.471099
+        ]
+      },
+      "properties": {
+        "alias": "VelociCoaster",
+        "name": "Jurassic World VelociCoaster",
+        "park": "islands",
+        "park_name": "Islands of Adventure",
+        "osm_type": "relation",
+        "osm_id": 17295822,
+        "source_name": "Jurassic World VelociCoaster",
+        "source_url": "https://www.openstreetmap.org/relation/17295822",
+        "coordinate_kind": "mapped building/station bounding-box center",
+        "verified_on": "2026-11-10"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "578bbd12-1975-4ec3-9879-ea641c780342",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.4735089,
+          28.4734362
+        ]
+      },
+      "properties": {
+        "alias": "Hagrid's Motorbike",
+        "name": "Hagrid's Magical Creatures Motorbike Adventure\u2122",
+        "park": "islands",
+        "park_name": "Islands of Adventure",
+        "osm_type": "node",
+        "osm_id": 8248132721,
+        "source_name": "Hagrid\u2019s Magical Creatures Motorbike Adventure",
+        "source_url": "https://www.openstreetmap.org/node/8248132721",
+        "coordinate_kind": "mapped attraction node",
+        "verified_on": "2026-11-10"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fa743143-281b-4b5b-b87b-d49fcb006772",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.4687757,
+          28.4715017
+        ]
+      },
+      "properties": {
+        "alias": "Hulk Coaster",
+        "name": "The Incredible Hulk Coaster\u00ae",
+        "park": "islands",
+        "park_name": "Islands of Adventure",
+        "osm_type": "node",
+        "osm_id": 8248062617,
+        "source_name": "The Incredible Hulk Coaster",
+        "source_url": "https://www.openstreetmap.org/node/8248062617",
+        "coordinate_kind": "mapped attraction node",
+        "verified_on": "2026-11-10"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6be23178-7d00-4884-9e88-76787da1df86",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.4696594,
+          28.4700548
+        ]
+      },
+      "properties": {
+        "alias": "Spider-Man",
+        "name": "The Amazing Adventures of Spider-Man\u00ae",
+        "park": "islands",
+        "park_name": "Islands of Adventure",
+        "osm_type": "relation",
+        "osm_id": 2453688,
+        "source_name": "The Amazing Adventures of Spider-Man",
+        "source_url": "https://www.openstreetmap.org/relation/2453688",
+        "coordinate_kind": "mapped building/station bounding-box center",
+        "verified_on": "2026-11-10"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6af80308-647d-4d8b-bcf6-37517a93bdbc",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.4739481,
+          28.4718757
+        ]
+      },
+      "properties": {
+        "alias": "Forbidden Journey",
+        "name": "Harry Potter and the Forbidden Journey\u2122",
+        "park": "islands",
+        "park_name": "Islands of Adventure",
+        "osm_type": "relation",
+        "osm_id": 17297382,
+        "source_name": "Harry Potter and the Forbidden Journey",
+        "source_url": "https://www.openstreetmap.org/relation/17297382",
+        "coordinate_kind": "mapped building/station bounding-box center",
+        "verified_on": "2026-11-10"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ec25d9a7-b4d4-4ebf-a6c4-c18389351764",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.4699854,
+          28.4768628
+        ]
+      },
+      "properties": {
+        "alias": "Revenge of the Mummy",
+        "name": "Revenge of the Mummy",
+        "park": "studios",
+        "park_name": "Universal Studios Florida",
+        "osm_type": "node",
+        "osm_id": 4694456530,
+        "source_name": "Revenge of the Mummy",
+        "source_url": "https://www.openstreetmap.org/node/4694456530",
+        "coordinate_kind": "mapped attraction node",
+        "verified_on": "2026-11-10"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "750939c5-a69e-408a-8d55-66c272fa265e",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.4684387,
+          28.4764
+        ]
+      },
+      "properties": {
+        "alias": "Transformers",
+        "name": "TRANSFORMERS\u2122: The Ride-3D",
+        "park": "studios",
+        "park_name": "Universal Studios Florida",
+        "osm_type": "node",
+        "osm_id": 5642698838,
+        "source_name": "Transformers\u2122: The Ride-3D",
+        "source_url": "https://www.openstreetmap.org/node/5642698838",
+        "coordinate_kind": "mapped attraction node",
+        "verified_on": "2026-11-10"
+      }
+    }
+  ]
+}

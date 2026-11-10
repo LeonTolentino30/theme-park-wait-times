@@ -8,6 +8,9 @@
 <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 <script src="{{ url_for('static', filename='current-waits.js') }}" defer></script>
 <script src="{{ url_for('static', filename='history.js') }}" defer></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.css') }}" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=">
+<script src="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.js') }}" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" defer></script>
+<script src="{{ url_for('static', filename='park-map.js') }}" defer></script>
 </head>
 <body>
 <header class="topbar"><a class="brand" href="/" aria-label="Queue Atlas home"><span class="brand-mark" aria-hidden="true">Q</span> QUEUE ATLAS</a><span class="local-badge"><span></span> LOCAL EXPLORER</span></header>
@@ -30,5 +33,6 @@
 <section class="details" aria-label="About these estimates"><article><span>01</span><h3>Built for exploration</h3><p>Eight supported rides. Seven weekdays. Discover patterns in simulated park waits.</p></article><article><span>02</span><h3>Patterns, not promises</h3><p>Estimates come from a model trained on synthetic observations. Actual waits may differ substantially.</p></article><article><span>03</span><h3>A local experience</h3><p>Explore synthetic estimates and separately collected park observations on your computer.</p></article></section>
 {% include '_current_waits.html' %}
 {% include '_history.html' %}
+{% include '_park_map.html' %}
 </main><footer><span class="footer-brand">QUEUE ATLAS</span><span>A little data. A little adventure.</span><span>Synthetic estimates &amp; stored observations &middot; Local only</span></footer>
 </body></html>

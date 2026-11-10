@@ -131,3 +131,7 @@ The homepage includes **Current Posted Waits** from the collector's latest succe
 ## Render deployment preparation
 
 A production WSGI entry point, safe build helper and `render.yaml` are prepared but not deployed. The initial public mode serves synthetic predictions only; real-data sections remain explicitly unavailable and private observations are never uploaded or substituted. [Deployment commands, environment variables, limitations and approval steps](docs/render_deployment.md).
+
+### Interactive attraction map
+
+See [local map review and geographic provenance](docs/park_map.md) for the seven supported attractions, OpenStreetMap licensing, tile privacy, and local preview instructions. The map displays locations only; synthetic estimates remain a separate labeled demo.

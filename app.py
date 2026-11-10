@@ -11,6 +11,8 @@ from src.current_waits import read_current_waits, DB as CURRENT_DB, REGISTRY as 
 
 from src.history import read_history, HistoryInputError, HistoryUnavailable
 
+from src.park_map import map_catalog
+
 DISCLAIMER = "SYNTHETIC MODEL ESTIMATES, NOT LIVE PARK WAIT TIMES"
 
 
@@ -71,13 +73,31 @@ def create_app(config=None):
         except HistoryUnavailable:
             return jsonify(error="Stored history is temporarily unavailable. Please try again later."), 503
 
+    def safe_map():
+        try:
+            return map_catalog()
+        except (OSError, ValueError, KeyError, TypeError):
+            return {"features": []}
+
+    @app.get("/api/map-attractions")
+    def map_attractions():
+        if set(request.args)-{"park"} or any(len(request.args.getlist(key))!=1 for key in request.args):
+            return jsonify(error="Provide only one park filter."), 400
+        park=request.args.get("park", "all")
+        if park not in {"all","islands","studios"}:
+            return jsonify(error="park must be all, islands, or studios"), 400
+        try:
+            return jsonify(map_catalog(park))
+        except (OSError, ValueError, KeyError, TypeError):
+            return jsonify(error="Attraction locations are temporarily unavailable."), 503
+
     @app.get("/healthz")
     def health():
         return jsonify(status="ok" if model is not None else "unavailable"), 200 if model is not None else 503
 
     @app.get("/")
     def index():
-        return render_template("index.html", rides=RIDES, days=DAYS, hours=range(8, 23), disclaimer=DISCLAIMER, current_waits=stored_waits(), observed_data_enabled=app.config["OBSERVED_DATA_ENABLED"])
+        return render_template("index.html", rides=RIDES, days=DAYS, hours=range(8, 23), disclaimer=DISCLAIMER, current_waits=stored_waits(), observed_data_enabled=app.config["OBSERVED_DATA_ENABLED"], park_map=safe_map())
 
     @app.post("/api/predict")
     def predict():
@@ -114,9 +134,9 @@ def create_app(config=None):
     @app.after_request
     def headers(response):
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
         response.headers["Cache-Control"] = "no-store"
-        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin" if request.endpoint == "index" else "no-referrer"
         if app.config["PUBLIC_DEPLOYMENT"]:
             response.headers["Strict-Transport-Security"] = "max-age=31536000"
         return response
