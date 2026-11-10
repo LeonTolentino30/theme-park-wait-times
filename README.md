@@ -127,3 +127,7 @@ The homepage includes **Current Posted Waits** from the collector's latest succe
 ## Phase 5: historical wait analytics
 
 **Historical Wait Trends** plots real stored posted waits for the seven active attractions, with 6-hour, 24-hour and 7-day windows. The read-only `/api/history` endpoint validates attraction/date inputs; closures, missing waits and collection gaps break the chart. No values are interpolated or generated. [Viewing instructions and API details](docs/historical_analytics.md).
+
+## Render deployment preparation
+
+A production WSGI entry point, safe build helper and `render.yaml` are prepared but not deployed. The initial public mode serves synthetic predictions only; real-data sections remain explicitly unavailable and private observations are never uploaded or substituted. [Deployment commands, environment variables, limitations and approval steps](docs/render_deployment.md).

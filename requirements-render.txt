@@ -1,0 +1,3 @@
+# Linux production runtime; local Windows requirements remain unchanged.
+-r requirements.txt
+gunicorn==26.2.0
