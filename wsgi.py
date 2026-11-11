@@ -1,4 +1,5 @@
-"""Render entry point. Public demo never reads private provider observations."""
+"""Render entry point. No SQLite access; cloud history remains explicitly opt-in."""
 from app import create_app
+from src.history_production import production_config
 
-application = create_app({"PUBLIC_DEPLOYMENT": True})
+application = create_app(production_config())

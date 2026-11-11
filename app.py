@@ -12,20 +12,49 @@ from src.current_waits import read_current_waits, DB as CURRENT_DB, REGISTRY as 
 from src.history import read_history, HistoryInputError, HistoryUnavailable
 
 from src.park_map import map_catalog
+from markupsafe import Markup
+from src.history_snapshots import load as load_snapshot, window as snapshot_window, public_registry, SnapshotError, SnapshotInputError
+from src.history_chart import svg_chart, display as history_display
+from src.history_r2 import ValidatedSnapshotCache, StorageUnavailable
 
 DISCLAIMER = "SYNTHETIC MODEL ESTIMATES, NOT LIVE PARK WAIT TIMES"
 
 
 def create_app(config=None):
     app = Flask(__name__)
-    app.config.update(DEBUG=False, MAX_CONTENT_LENGTH=4096)
+    app.config.update(DEBUG=False, MAX_CONTENT_LENGTH=4096, HISTORY_SNAPSHOT_STORE=None, HISTORY_PRIVATE_LOCAL=False, HISTORY_PRODUCTION_ENABLED=False, HISTORY_SNAPSHOT_PROVIDER=None, HISTORY_PRODUCTION_FIXTURE_DEMO=False)
     app.config.update(CURRENT_WAITS_DB=CURRENT_DB, CURRENT_WAITS_REGISTRY=CURRENT_REGISTRY, OBSERVED_DATA_ENABLED=True, PUBLIC_DEPLOYMENT=False)
     if config:
         app.config.update(config)
+    if app.config["HISTORY_PRODUCTION_ENABLED"]:
+        if (not app.config["PUBLIC_DEPLOYMENT"] or app.config["HISTORY_PRIVATE_LOCAL"]
+                or app.config["HISTORY_SNAPSHOT_STORE"] is not None
+                or not isinstance(app.config["HISTORY_SNAPSHOT_PROVIDER"], ValidatedSnapshotCache)):
+            raise ValueError("Production history requires an isolated validated snapshot provider")
+    elif app.config["HISTORY_SNAPSHOT_PROVIDER"] is not None:
+        raise ValueError("Snapshot provider requires explicit history activation")
+    if app.config["HISTORY_PRIVATE_LOCAL"]:
+        if app.config["PUBLIC_DEPLOYMENT"] or app.config["HISTORY_SNAPSHOT_STORE"] is None:
+            raise ValueError("Private snapshot mode requires a local-only store and cannot be deployed publicly")
+        if load_snapshot(app.config["HISTORY_SNAPSHOT_STORE"], allow_real=True)["dataset_kind"] != "collected_observations":
+            raise ValueError("Private snapshot mode requires genuine collected observations")
+        app.config.update(DEBUG=False)
     if app.config["PUBLIC_DEPLOYMENT"]:
         app.config.update(DEBUG=False, TESTING=False, PROPAGATE_EXCEPTIONS=False, OBSERVED_DATA_ENABLED=False)
+    if app.config["HISTORY_SNAPSHOT_STORE"] is not None or app.config["HISTORY_PRODUCTION_ENABLED"]:
+        # Fixture mode must never fall back to real collector observations.
+        app.config["OBSERVED_DATA_ENABLED"] = False
+    chart_requests = deque()
+    chart_lock = Lock()
     prediction_requests = deque()
     prediction_lock = Lock()
+
+    @app.before_request
+    def private_preview_boundary():
+        if app.config["HISTORY_PRIVATE_LOCAL"]:
+            from re import fullmatch
+            if request.remote_addr not in {"127.0.0.1", "::1"} or not fullmatch(r"(?:localhost|127\.0\.0\.1|\[::1\])(?::[0-9]+)?", request.host.lower()):
+                return app.response_class("Private local preview only.", status=403, mimetype="text/plain")
 
     @app.before_request
     def public_request_limit():
@@ -40,6 +69,19 @@ def create_app(config=None):
                     response.headers["Retry-After"] = "60"
                     return response
                 prediction_requests.append(now)
+
+    @app.before_request
+    def chart_request_limit():
+        if request.path == "/history/chart" and (app.config["HISTORY_SNAPSHOT_STORE"] is not None or app.config["HISTORY_PRODUCTION_ENABLED"]):
+            now = time.monotonic()
+            with chart_lock:
+                while chart_requests and chart_requests[0] <= now-60:
+                    chart_requests.popleft()
+                if len(chart_requests) >= 30:
+                    response = app.response_class("Historical chart request limit reached. Retry in one minute.", status=429, mimetype="text/plain")
+                    response.headers["Retry-After"] = "60"
+                    return response
+                chart_requests.append(now)
 
     # Fixed-path, hash-checked Phase 1 loader; never loads the legacy artifact.
     try:
@@ -73,6 +115,42 @@ def create_app(config=None):
         except HistoryUnavailable:
             return jsonify(error="Stored history is temporarily unavailable. Please try again later."), 503
 
+    @app.get("/history/chart")
+    def snapshot_chart():
+        store = app.config["HISTORY_SNAPSHOT_STORE"]
+        provider = app.config["HISTORY_SNAPSHOT_PROVIDER"] if app.config["HISTORY_PRODUCTION_ENABLED"] else None
+        if store is None and provider is None:
+            return app.response_class("Historical snapshots are not configured.", status=503, mimetype="text/plain")
+        if len(request.query_string) > 512:
+            return app.response_class("Chart request is too long.", status=400, mimetype="text/plain")
+        params = request.args.to_dict()
+        if (set(params)-{"attraction_id", "hours", "mode"}
+                or any(len(request.args.getlist(key)) != 1 for key in request.args)
+                or params.get("hours", "24") not in {"6", "24", "168"}
+                or params.get("mode", "archive") not in {"archive", "rolling"}):
+            return app.response_class("Choose one attraction, a 6/24/168-hour window and archive or rolling mode.", status=400, mimetype="text/plain")
+        if (app.config["HISTORY_PRODUCTION_ENABLED"]
+                and not app.config["HISTORY_PRODUCTION_FIXTURE_DEMO"]
+                and params.get("mode", "archive") != "archive"):
+            return app.response_class("Choose an archived historical window.", status=400, mimetype="text/plain")
+        try:
+            registry = public_registry()
+            if params.get("attraction_id") not in registry:
+                raise SnapshotInputError("Choose a supported attraction.")
+            data = provider.snapshot(registry) if provider is not None else load_snapshot(store, registry, allow_real=app.config["HISTORY_PRIVATE_LOCAL"])
+            view = snapshot_window(params, data, registry=registry)
+            view["private_local"] = app.config["HISTORY_PRIVATE_LOCAL"]
+            svg = svg_chart(view)
+            return render_template("_snapshot_chart.html", view=view, svg=Markup(svg) if svg else None, display=history_display)
+        except SnapshotInputError:
+            return app.response_class("Choose a supported attraction.", status=400, mimetype="text/plain")
+        except StorageUnavailable as error:
+            response = app.response_class("Historical chart temporarily unavailable. Please try again later.", status=503, mimetype="text/plain")
+            response.headers["Retry-After"] = str(error.retry_after)
+            return response
+        except (SnapshotError, OSError, ValueError, KeyError, TypeError):
+            return app.response_class("Historical chart temporarily unavailable. Please try again later.", status=503, mimetype="text/plain")
+
     def safe_map():
         try:
             return map_catalog()
@@ -97,7 +175,7 @@ def create_app(config=None):
 
     @app.get("/")
     def index():
-        return render_template("index.html", rides=RIDES, days=DAYS, hours=range(8, 23), disclaimer=DISCLAIMER, current_waits=stored_waits(), observed_data_enabled=app.config["OBSERVED_DATA_ENABLED"], park_map=safe_map())
+        return render_template("index.html", rides=RIDES, days=DAYS, hours=range(8, 23), disclaimer=DISCLAIMER, current_waits=stored_waits(), observed_data_enabled=app.config["OBSERVED_DATA_ENABLED"], park_map=safe_map(), history_attractions=safe_map().get("features", []), history_snapshot_enabled=app.config["HISTORY_SNAPSHOT_STORE"] is not None or app.config["HISTORY_PRODUCTION_ENABLED"], history_real_private=app.config["HISTORY_PRIVATE_LOCAL"], history_real_public=app.config["HISTORY_PRODUCTION_ENABLED"] and not app.config["HISTORY_PRODUCTION_FIXTURE_DEMO"])
 
     @app.post("/api/predict")
     def predict():

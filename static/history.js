@@ -71,11 +71,20 @@
     const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 10000);
     try {
       const query = new URLSearchParams({attraction_id: document.querySelector("#history-ride").value, hours: document.querySelector("#history-window").value});
+      if (form.dataset.snapshot === "true") {
+        query.set("mode", document.querySelector("#history-anchor").value);
+        const response = await fetch(`/history/chart?${query}`, {cache: "no-store", signal: controller.signal});
+        if (!response.ok) throw new Error("Historical chart unavailable");
+        const fragment = new DOMParser().parseFromString(await response.text(), "text/html");
+        chart.replaceChildren(...fragment.body.childNodes);
+        message.textContent = form.dataset.fixture === "false" ? "Archived posted waits. Not live waits, measured queue durations or AI forecasts." : "Synthetic test fixture chart. Not real historical observations.";
+        return;
+      }
       const response = await fetch(`/api/history?${query}`, {cache: "no-store", signal: controller.signal});
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Stored history is temporarily unavailable.");
       render(data);
-    } catch (error) { message.textContent = error.name === "AbortError" ? "The request timed out. Please try again." : "Historical observations could not be displayed. Please check your selections and try again."; }
+    } catch (error) { message.textContent = error.name === "AbortError" ? "The request timed out. Please try again." : form.dataset.snapshot === "true" ? "Historical chart could not load. It may be unavailable or rate limited; please retry later." : "Historical observations could not be displayed. Please check your selections and try again."; }
     finally { clearTimeout(timeout); button.disabled = false; for (const select of form.querySelectorAll("select")) select.disabled = false; panel.setAttribute("aria-busy", "false"); }
   });
   form.addEventListener("change", () => { chart.replaceChildren(); events.replaceChildren(); period.textContent = ""; message.textContent = "Select Show wait trends to load this observation window."; });

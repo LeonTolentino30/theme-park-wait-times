@@ -135,3 +135,17 @@ A production WSGI entry point, safe build helper and `render.yaml` are prepared 
 ### Interactive attraction map
 
 See [local map review and geographic provenance](docs/park_map.md) for the seven supported attractions, OpenStreetMap licensing, tile privacy, and local preview instructions. The map displays locations only; synthetic estimates remain a separate labeled demo.
+
+### Fixture-only private historical chart prototype
+
+An opt-in [snapshot architecture demonstration](docs/history_snapshots.md) runs with `python -B -m src.history_fixture_demo` at http://127.0.0.1:5001. It uses explicitly invented test fixtures, no collector database or cloud credentials. The existing local history feature and default public deployment remain unchanged.
+
+The [fixture-only extraction dry run](docs/history_extraction.md) supports exact fractional timestamps and the collector schema: `python -B -m src.history_extraction --dry-run-fixtures`. It creates only temporary invented data and does not accept a real database path.
+
+An explicitly authorized [private collected-snapshot preview](docs/history_real_snapshot.md) runs locally on port 5002. It reads a separately generated, Git-ignored local bundle; the default public deployment cannot enable this private mode.
+
+### Private-storage production history preparation (disabled)
+
+The [R2-compatible read-only adapter and production chart path](docs/history_r2_integration.md) are implemented but not activated. Run `python -B -m src.history_production_fixture_demo` for an entirely offline invented-fixture demo at http://127.0.0.1:5003. No cloud credentials, real observations, uploads or SQLite access are required.
+
+Historical production launch preparation and secure local verification: [Phase 8P readiness](docs/history_launch_readiness.md). Public activation remains a separate approved step.
